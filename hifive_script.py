@@ -2,19 +2,13 @@ import time
 import pylink
 import serial
 import serial.tools.list_ports
-import threading
+
 
 BOARD_NAME = 'HiFive'
 hifive_serial_no = ''
 hifive_ports = []
 
-def read_from_port(port):
-    line = ''
-    for i in range(10):
-        line = port.readline().decode('utf-8')
-        print(line)
-    
-        
+  
 print('Waiting for board \n')
 while(len(hifive_ports) <= 1):
     time.sleep(1)
@@ -30,11 +24,11 @@ jlink = pylink.JLink(serial_no= hifive_serial_no)
 jlink.open()
 jlink.connect(chip_name='RISC-V')
 jlink.reset()
-
+jlink.close()
 
 try:
-    hifive_port_0 = serial.Serial(port= hifive_ports[0], baudrate= 115200) 
-    hifive_port_1= serial.Serial(port= hifive_ports[1], baudrate= 115200)
+    hifive_port_0 = serial.Serial(port= hifive_ports[0], baudrate= 115200, timeout = 5) 
+    hifive_port_1= serial.Serial(port= hifive_ports[1], baudrate= 115200, timeout = 5)
 except:
     print('No board connected')
 
@@ -60,22 +54,17 @@ words = line.split(' ')
 mac_addr = words.pop()
 mac_addr = mac_addr[:17]
 print(mac_addr)
-
-print(repr(mac_addr))
-print(mac_addr.encode())
-
 password= f'__SecLab__{mac_addr}'
-password = password.encode()
-print(password)
-
-port_0_thread = threading.Thread(read_from_port(hifive_port_0))
-port_0_thread.start()
+print("PASSWORD:", password)
 
 
-hifive_port_0.write(password)
+print(hifive_port_0.read_until('dupa'))
+
+hifive_port_0.write(bytes(password, 'utf-8'))
+print(hifive_port_0.read_until('dupa'))
+
 
 # EPILOGUE
-jlink.close()
 hifive_port_0.close()
 hifive_port_1.close()
 
