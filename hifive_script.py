@@ -2,7 +2,7 @@ import time
 import pylink
 import serial
 import serial.tools.list_ports
-
+import os
 
 
 BOARD_PORT = ['/dev/ttyACM0', '/dev/ttyACM1']
@@ -32,20 +32,13 @@ while(len(hifive_ports) <= 1):
 
 print('Detected board at ports:',hifive_ports, '\nSERIAL_NO:  ', hifive_serial_no) 
 
-jlink = pylink.JLink(serial_no= hifive_serial_no)
-jlink.open()
-jlink.connect(chip_name='RISC-V')
-jlink.reset()
-jlink.close()
+os.system('echo "Reset" | JLinkExe -device RISC-V -if JTAG -speed 4000 -jtagconf -1-1 -autoconnect 1')
 
 try:
     hifive_port_0 = serial.Serial(port= hifive_ports[0], baudrate= 115200, timeout = 0.1) 
     hifive_port_1= serial.Serial(port= hifive_ports[1], baudrate= 115200, timeout = 0.1)
 except:
     print('No board connected')
-
-
-
 
 
 hifive_port_1.dtr = 0
@@ -59,8 +52,6 @@ while 'sta_mac' not in line:
     time.sleep(0.1)
     line = hifive_port_1.readline().decode('utf-8')
 
-
-
 words = line.split(' ')
 
 mac_addr = words.pop()
@@ -68,7 +59,7 @@ mac_addr = mac_addr[:17]
 password= f'__SecLab__{mac_addr}'
 print("PASSWORD:", password, '\n')
 
-print("HIFIVE OUTPUT: \n", hifive_port_0.read_until('SecLab'))
+print(hifive_port_0.read_until('SecLab'))
 
 hifive_port_0.write(bytes(password, 'utf-8'))
 print(hifive_port_0.read_until('SecLab'))
@@ -89,7 +80,7 @@ print('\nCUSTOM GAME:     [', custom_game, "]")
 
 for i in range(2049 - len(custom_game)):
     custom_game = custom_game + b'\1'
-print('CUSTOM_GAME LENGTH       ', len(custom_game),'\n')
+print('CUSTOM_GAME + PADDING LENGTH       ', len(custom_game),'\n')
 
 hifive_port_0.write(custom_game)
 print(hifive_port_0.read_until('SecLab'))
