@@ -66,11 +66,11 @@ hifive_output = b''
 
 
 
-for i in range(2):
+for i in range(3):
     os.system('make clean')
-    os.system('make')
+    os.system('make dump-raw')
     
-    filename = f'custom_game{i+1}.bin'
+    filename = f'game{i}.raw'
     print('\n\nOPENING', filename, '\n')
     f = open(filename, 'rb')
     custom_game = copy.deepcopy(f.read())
@@ -92,36 +92,25 @@ for i in range(2):
 
     hifive_port_0.write(custom_game)
 
-    
-
     hifive_output= hifive_port_0.read_until('SecLab')
     print(hifive_output)
 
-    ### UGLY APPROACH
-    if i == 0:
+
+    if i == 0: 
         token = hifive_output[42:46]
         print('TOKEN:   ', token)
         token = token[::-1]
-        print('TOKEN:   ', token)
+        print('TOKEN REVERSED:   ', token)
+        lines = open('game1.c', 'r').readlines()
+        token = int.from_bytes(token,'big')
+        lines[5] = f'\tunlock_syscalls({token});\n'
+        out = open('game1.c', 'w')
+        out.writelines(lines)
+        out.close()
+        
+            
 
-        if token != b'':
-            filename = f'custom_game2.s'
-            file = open(filename, 'w')
-            syscall_7_1 = '\taddi    a0, x0, 0x7\n\tli      a1, 0x'
-            syscall_7_2 ='\n\taddi    a2, x0, 0\n\tecall\n\t'
-            syscall_6 = 'addi    a0, x0, 0x6\n\tli      a1, 0x80003900\n\taddi    a2, x0, 0\n\tecall\n\t'
-            syscall_exit= 'addi    a0, x0, 1\n\tli      a1, 0\n\taddi    a2, x0, 0\n\tecall\n\t'
-            syscall_2 = '\n\taddi    a0, x0, 0x2\n\tla      a1, 0x80003900\n\taddi    a2, x0, 0\n\tecall\n\t'       
-
-            #addi    a2, x0, 0\n\t
-            print('TOKEN:', token.hex())
-            file.write(syscall_7_1+token.hex()+syscall_7_2+syscall_6+syscall_2+syscall_exit)
-            file.close()
-    ### END UGLY APPROACH
     
-    
-
-
 # EPILOGUE
 hifive_port_0.close()
 hifive_port_1.close()
