@@ -1,4 +1,9 @@
 SECTIONS {
+  /* callAT function */
+  . = 0x0801600;
+  .text.callATCommand : {
+    *(.callATCommand)
+  }
 
   /* ITIM memory */
   . = 0x8001000;
@@ -17,7 +22,7 @@ SECTIONS {
 
   /* DTIM memory */
   . = 0x80000000;
-
+  
   .data (NOLOAD) : { *(.data*) }
 
   /* variables for bss initializations */

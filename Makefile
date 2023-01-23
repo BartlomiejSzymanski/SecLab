@@ -16,8 +16,8 @@ CFLAGS := -march=rv32imac -mabi=ilp32 -mtune=sifive-3-series -nostdlib -Os -Wno-
 # -Tlinker.ld is the linker script
 # --entry=_start --gc-sections make unused code disapear (garbage collection)
 LDFLAGS := $(CFLAGS) -Tlinker.ld --entry=_start -Wl,--gc-sections
-
-all: main.raw game0.raw game1.raw
+LDFLAGS_2 := $(CFLAGS) -Tlinker.ld --entry=_start -Wl,--gc-sections
+all: main.raw game0.raw game1.raw game2.raw game3.raw
 
 game0.raw: game0
 	$(OBJCOPY) -O binary $< $@
@@ -28,18 +28,24 @@ game1.raw: game1
 game2.raw: game2
 	$(OBJCOPY) -O binary $< $@
 
-
+game3.raw: game3
 	$(OBJCOPY) -O binary $< $@
+
 game0: game0.o syscalls.o helpers.o startup.o 
 game1: game1.o syscalls.o helpers.o startup.o
 game2: game2.o syscalls.o helpers.o startup.o
+game3: game3.o syscalls.o helpers.o startup.o
 
 clean:
-	rm -f *.raw *.o game0 game1 game2
+	rm -f *.raw *.o game0 game1 game2 game3
 
-dump-raw: game0.raw game1.raw game2.raw
+dump-raw: game0.raw game1.raw game2.raw game3.raw
 	$(OBJDUMP) -b binary -m riscv:rv32 -D game0.raw 
 	$(OBJDUMP) -b binary -m riscv:rv32 -D game1.raw 
 	$(OBJDUMP) -b binary -m riscv:rv32 -D game2.raw 
+	$(OBJDUMP) -b binary -m riscv:rv32 -D game3.raw 
+dump: game3
+	$(OBJDUMP) -D $<
+
 # dump: main
 # 	$(OBJDUMP) -D $<
