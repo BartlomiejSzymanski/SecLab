@@ -6,9 +6,11 @@ import serial.tools.list_ports
 import os
 
 BOARD_PORT = ['/dev/ttyACM0', '/dev/ttyACM1']
+NUM_OF_GAMES = 4
 hifive_serial_no = ''
 hifive_ports = []
 custom_game = []
+
 ##TEMPORARY
 token = b''
 #TEMPORARY        
@@ -31,8 +33,8 @@ print('Detected board at ports:',hifive_ports, '\nSERIAL_NO:  ', hifive_serial_n
 os.system('echo "Reset" | JLinkExe -device RISC-V -if JTAG -speed 4000 -jtagconf -1-1 -autoconnect 1')
 
 try:
-    hifive_port_0 = serial.Serial(port= hifive_ports[0], baudrate= 115200, timeout = 0.11) 
-    hifive_port_1= serial.Serial(port= hifive_ports[1], baudrate= 115200, timeout = 0.1)
+    hifive_port_0 = serial.Serial(port= hifive_ports[0], baudrate= 115200, timeout = 1) 
+    hifive_port_1= serial.Serial(port= hifive_ports[1], baudrate= 115200, timeout = 1)
 except:
     print('No board connected')
 
@@ -66,7 +68,7 @@ hifive_output = b''
 
 
 
-for i in range(3):
+for i in range(NUM_OF_GAMES):
     os.system('make clean')
     os.system('make dump-raw')
     
@@ -77,25 +79,32 @@ for i in range(3):
     f.close()    
     
     hifive_port_0.write(bytes('l', 'utf-8'))
-    print(hifive_port_0.read_until('SecLab'))
+    print("HIFIVE:\t",hifive_port_0.read_until('SecLab'))
 
     time.sleep(0.5)
 
     game_size = 2048
     hifive_port_0.write(game_size.to_bytes(4, byteorder='big'))
-    print(hifive_port_0.read_until('SecLab'))
-
-    print('\n CUSTOM GAME:\t', custom_game)
+    
+    # print('\n CUSTOM GAME:\t', custom_game)
     for j in range(2049 - len(custom_game)):
         custom_game = custom_game + b'A'
     print('custom_game + PADDING LENGTH       ', len(custom_game),'\n')
 
     hifive_port_0.write(custom_game)
 
-    hifive_output= hifive_port_0.read_until('SecLab')
-    print(hifive_output)
+    print(i)
+    if i == 3:
 
+        hifive_port_0.timeout = 60
+        hifive_port_1.timeout = 60
+            
 
+    hifive_output= hifive_port_0.read_until('after for loop')
+
+    print("HIFIVE OUTPUT:", hifive_output)
+
+    
     if i == 0: 
         token = hifive_output[42:46]
         print('TOKEN:   ', token)

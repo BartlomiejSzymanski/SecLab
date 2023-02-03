@@ -1,9 +1,4 @@
 SECTIONS {
-  /* callAT function */
-  . = 0x0801600;
-  .text.callATCommand : {
-    *(.callATCommand)
-  }
 
   /* ITIM memory */
   . = 0x8001000;

@@ -40,12 +40,12 @@ clean:
 	rm -f *.raw *.o game0 game1 game2 game3
 
 dump-raw: game0.raw game1.raw game2.raw game3.raw
-	$(OBJDUMP) -b binary -m riscv:rv32 -D game0.raw 
-	$(OBJDUMP) -b binary -m riscv:rv32 -D game1.raw 
-	$(OBJDUMP) -b binary -m riscv:rv32 -D game2.raw 
-	$(OBJDUMP) -b binary -m riscv:rv32 -D game3.raw 
+	$(OBJDUMP) -b binary -m riscv:rv32 -D game0.raw > /dev/null
+	$(OBJDUMP) -b binary -m riscv:rv32 -D game1.raw > /dev/null
+	$(OBJDUMP) -b binary -m riscv:rv32 -D game2.raw > /dev/null
+	$(OBJDUMP) -b binary -m riscv:rv32 -D game3.raw > /dev/null
 dump: game3
-	$(OBJDUMP) -D $<
+	$(OBJDUMP) $< 
 
 # dump: main
 # 	$(OBJDUMP) -D $<
