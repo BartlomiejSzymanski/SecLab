@@ -1,5 +1,6 @@
-#include<stdio.h>
 #include<stdint.h>
+#include"syscalls.h"
+
 #define OUTPUT_ENABLE 0x08
 #define OUTPUT_PORT   0x0C
 #define IOF_EN        0x38
@@ -9,6 +10,7 @@
 
 void main(void){
 
+exit(0);
 uint32_t *output_enable = (uint32_t *)(GPIO_BASE + OUTPUT_ENABLE);
 uint32_t *output_port   = (uint32_t *)(GPIO_BASE + OUTPUT_PORT);
 uint32_t *iof_en   = (uint32_t *)(GPIO_BASE + IOF_EN);
@@ -19,4 +21,5 @@ uint32_t *iof_sel   = (uint32_t *)(GPIO_BASE + IOF_SEL);
 *iof_en        = 0x01 << 21;
 *iof_sel       = 0x01 << 21;
 
+exit(0);
 }
