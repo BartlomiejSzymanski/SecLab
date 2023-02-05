@@ -96,8 +96,8 @@ for i in range(NUM_OF_GAMES):
     print(i)
     if i == 3:
 
-        hifive_port_0.timeout = 60
-        hifive_port_1.timeout = 60
+        hifive_port_0.timeout = 100
+        hifive_port_1.timeout = 100
             
 
     hifive_output= hifive_port_0.read_until('after for loop')
